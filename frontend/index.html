@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca Digital</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <h1 class="logo">📚 Biblioteca Digital</h1>
+                <nav class="nav">
+                    <div id="user-info" class="user-info" style="display: none;">
+                        <span id="user-name"></span>
+                        <button id="logout-btn" class="btn btn-secondary">Cerrar Sesión</button>
+                    </div>
+                    <div id="login-link" class="login-link">
+                        <a href="login.html" class="btn btn-primary">Iniciar Sesión</a>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Tabs Navigation -->
+                <div class="tabs" id="tabs" style="display: none;">
+                    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+                    <button class="tab-btn" data-tab="libros">Libros</button>
+                    <button class="tab-btn" data-tab="prestamos">Préstamos</button>
+                    <button class="tab-btn" data-tab="perfil">Mi Perfil</button>
+                    <button class="tab-btn admin-only" data-tab="admin" style="display: none;">Administración</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Dashboard Tab -->
+                    <div id="dashboard-tab" class="tab-pane active">
+                        <h2>Dashboard</h2>
+                        <div class="stats-grid" id="stats-grid">
+                            <!-- Las estadísticas se cargarán dinámicamente -->
+                        </div>
+                        
+                        <div class="recent-section">
+                            <h3>Mis Préstamos Activos</h3>
+                            <div id="my-prestamos" class="prestamos-list">
+                                <!-- Los préstamos se cargarán dinámicamente -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Libros Tab -->
+                    <div id="libros-tab" class="tab-pane">
+                        <div class="section-header">
+                            <h2>Catálogo de Libros</h2>
+                            <div class="actions">
+                                <input type="text" id="search-input" placeholder="Buscar libros..." class="search-input">
+                                <button id="add-libro-btn" class="btn btn-primary admin-only" style="display: none;">
+                                    Agregar Libro
+                                </button>
+                            </div>
+                        </div>
+                        <div id="libros-grid" class="libros-grid">
+                            <!-- Los libros se cargarán dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Préstamos Tab -->
+                    <div id="prestamos-tab" class="tab-pane">
+                        <div class="section-header">
+                            <h2>Gestión de Préstamos</h2>
+                            <button id="add-prestamo-btn" class="btn btn-primary admin-only" style="display: none;">
+                                Nuevo Préstamo
+                            </button>
+                        </div>
+                        <div id="prestamos-list" class="prestamos-list">
+                            <!-- Los préstamos se cargarán dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Perfil Tab -->
+                    <div id="perfil-tab" class="tab-pane">
+                        <h2>Mi Perfil</h2>
+                        <div class="profile-form">
+                            <form id="profile-form">
+                                <div class="form-group">
+                                    <label for="profile-nombre">Nombre:</label>
+                                    <input type="text" id="profile-nombre" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="profile-email">Email:</label>
+                                    <input type="email" id="profile-email" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Actualizar Perfil</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Admin Tab -->
+                    <div id="admin-tab" class="tab-pane">
+                        <h2>Panel de Administración</h2>
+                        
+                        <div class="admin-sections">
+                            <!-- Gestión de Usuarios -->
+                            <div class="admin-section">
+                                <h3>Gestión de Usuarios</h3>
+                                <div id="usuarios-list" class="admin-list">
+                                    <!-- Los usuarios se cargarán dinámicamente -->
+                                </div>
+                            </div>
+
+                            <!-- Gestión de Libros -->
+                            <div class="admin-section">
+                                <h3>Gestión de Libros</h3>
+                                <div id="admin-libros-list" class="admin-list">
+                                    <!-- Los libros se cargarán dinámicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Modales -->
+        <!-- Modal para agregar/editar libro -->
+        <div id="libro-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3 id="libro-modal-title">Agregar Libro</h3>
+                <form id="libro-form">
+                    <input type="hidden" id="libro-id">
+                    <div class="form-group">
+                        <label for="libro-titulo">Título:</label>
+                        <input type="text" id="libro-titulo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="libro-autor">Autor:</label>
+                        <input type="text" id="libro-autor" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="libro-isbn">ISBN:</label>
+                        <input type="text" id="libro-isbn" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="libro-editorial">Editorial:</label>
+                        <input type="text" id="libro-editorial">
+                    </div>
+                    <div class="form-group">
+                        <label for="libro-año">Año:</label>
+                        <input type="number" id="libro-año" min="1000" max="2024">
+                    </div>
+                    <div class="form-group">
+                        <label for="libro-genero">Género:</label>
+                        <input type="text" id="libro-genero">
+                    </div>
+                    <div class="form-group">
+                        <label for="libro-descripcion">Descripción:</label>
+                        <textarea id="libro-descripcion" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="libro-ejemplares">Ejemplares:</label>
+                        <input type="number" id="libro-ejemplares" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="libro-imagen">URL de Imagen:</label>
+                        <input type="url" id="libro-imagen">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-secondary cancel-btn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal para préstamos -->
+        <div id="prestamo-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h3>Nuevo Préstamo</h3>
+                <form id="prestamo-form">
+                    <div class="form-group">
+                        <label for="prestamo-usuario">Usuario:</label>
+                        <select id="prestamo-usuario" required>
+                            <option value="">Seleccionar usuario...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="prestamo-libro">Libro:</label>
+                        <select id="prestamo-libro" required>
+                            <option value="">Seleccionar libro...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="prestamo-fecha-devolucion">Fecha de Devolución:</label>
+                        <input type="date" id="prestamo-fecha-devolucion" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Crear Préstamo</button>
+                        <button type="button" class="btn btn-secondary cancel-btn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
