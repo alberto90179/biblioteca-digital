@@ -50,19 +50,18 @@ const connectDB = async () => {
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
     });
-    
+
     console.log('✅ MongoDB conectado exitosamente');
     console.log(`📊 Base de datos: ${mongoose.connection.db.databaseName}`);
-    
-    // Eventos de conexión
+
     mongoose.connection.on('error', err => {
       console.error('❌ Error de MongoDB:', err);
     });
-    
+
     mongoose.connection.on('disconnected', () => {
       console.log('⚠️  MongoDB desconectado');
     });
-    
+
   } catch (error) {
     console.error('❌ Error conectando a MongoDB:', error);
     process.exit(1);
@@ -108,7 +107,7 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ==================== RUTAS PÚBLICAS ====================
 
-// Health check extendido
+// Health check
 app.get('/api/health', (req, res) => {
   const healthCheck = {
     success: true,
@@ -120,11 +119,11 @@ app.get('/api/health', (req, res) => {
     memory: process.memoryUsage(),
     version: process.version
   };
-  
+
   res.json(healthCheck);
 });
 
-// Información del API
+// Información general del API
 app.get('/api', (req, res) => {
   res.json({
     name: 'Biblioteca Digital API',
@@ -151,10 +150,9 @@ app.get('/api', (req, res) => {
 // Rate limiting específico para auth
 app.use('/api/auth', authLimiter);
 
-// Rutas de autenticación públicas
-const authRoutes = require('./routes/auth');
-app.post('/api/auth/registro', authRoutes.registro);
-app.post('/api/auth/login', authRoutes.login);
+// ==================== RUTAS DE AUTENTICACIÓN (CORREGIDO) ====================
+// Cargar router completo sin llamar funciones inexistentes
+app.use('/api/auth', require('./routes/auth'));
 
 // ==================== MIDDLEWARE DE AUTENTICACIÓN ====================
 
@@ -169,8 +167,6 @@ app.use('/api', apiLimiter);
 
 // ==================== RUTAS PROTEGIDAS ====================
 
-// Cargar rutas
-app.use('/api/auth', require('./routes/auth'));
 app.use('/api/libros', require('./routes/libros'));
 app.use('/api/usuarios', require('./routes/usuarios'));
 app.use('/api/prestamos', require('./routes/prestamos'));
@@ -183,10 +179,10 @@ app.use('*', (req, res) => {
   SecurityAudit.logSecurityEvent('ROUTE_NOT_FOUND', {
     path: req.originalUrl,
     method: req.method,
-    ip: req.clientInfo.ip,
-    userAgent: req.clientInfo.userAgent
+    ip: req.clientInfo?.ip,
+    userAgent: req.clientInfo?.userAgent
   });
-  
+
   res.status(404).json({
     success: false,
     message: 'Ruta no encontrada',
@@ -207,15 +203,13 @@ app.use((err, req, res, next) => {
     userId: req.auth ? req.auth.id : 'anonymous'
   });
 
-  // Respuesta de error segura
   const errorResponse = {
     success: false,
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Error interno del servidor' 
+    message: process.env.NODE_ENV === 'production'
+      ? 'Error interno del servidor'
       : err.message
   };
 
-  // Agregar detalles en desarrollo
   if (process.env.NODE_ENV === 'development') {
     errorResponse.stack = err.stack;
     errorResponse.details = err.details;
@@ -230,10 +224,8 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
-    // Conectar a la base de datos
     await connectDB();
-    
-    // Iniciar servidor
+
     app.listen(PORT, () => {
       console.log('\n' + '='.repeat(50));
       console.log('🚀  SERVIDOR BIBLIOTECA DIGITAL INICIADO');
@@ -245,8 +237,7 @@ const startServer = async () => {
       console.log(`📚 Documentación: http://localhost:${PORT}/api/docs`);
       console.log(`❤️  Health check: http://localhost:${PORT}/api/health`);
       console.log('='.repeat(50) + '\n');
-      
-      // Log de seguridad
+
       SecurityAudit.logSecurityEvent('SERVER_STARTED', {
         port: PORT,
         environment: process.env.NODE_ENV,
@@ -260,7 +251,7 @@ const startServer = async () => {
   }
 };
 
-// Manejo graceful shutdown
+// Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('🛑 Recibido SIGTERM, cerrando servidor...');
   await mongoose.connection.close();
